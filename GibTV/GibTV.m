@@ -8,12 +8,6 @@
 #import <Foundation/Foundation.h>
 #import "GibTV.h"
 
-//@implementation _TVRCFeatures (FuckOff)
-//+(BOOL)rapportEnabled {
-//    return NO;
-//}
-//@end
-
 asm(".weak_reference _OBJC_CLASS_$_RPCompanionLinkClient");
 
 @implementation RPCompanionLinkClient (tvrc_setAllowedTVs)

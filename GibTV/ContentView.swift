@@ -42,23 +42,21 @@ extension _TVRXDevice {
     }
     
     func press(button buttonType: TVRCButtonType) {
+        trigger(button: buttonType, type: .buttonDown)
+    }
+    
+    func trigger(button buttonType: TVRCButtonType, type eventType: TVRCButtonEventType) {
         guard let button = button(withType: buttonType) else {
             return
         }
-        send(button.event(type: .buttonDown))
+        send(button.event(type: eventType))
     }
 }
 
 struct DeviceView: View {
-    @State var device: _TVRXDevice
-    var buttons: [TVRCButton]
-    
-    init(device: _TVRXDevice) {
-        self.device = device
-        self.buttons = device.supportedButtons().sorted { button1, button2 in
-            button1.buttonType() > button2.buttonType()
-        }
-    }
+    @Binding var device: _TVRXDevice
+    @Binding var buttons: [TVRCButton]
+    @Binding var editingContext: TVRCKeyboardAttributes?
     
     struct DeviceButton: View {
         @Binding var device: _TVRXDevice
@@ -205,13 +203,54 @@ struct DeviceView: View {
                 HStack {
                     Button(action: self.menu) {
                         Text("Menu")
-                    }.keyboardShortcut(.delete, modifiers: [])
+                    }.keyboardShortcut(.escape, modifiers: [])
                     Button(action: self.select) {
                         Text("Select")
                     }.keyboardShortcut(.return, modifiers: [])
                 }
                 Button(action: self.home) {
                     Image(systemName: "tv")
+                }
+            }
+        }
+    }
+    
+    struct TextEditingControl: View {
+        @Binding var device: _TVRXDevice
+        @Binding var editingContext: TVRCKeyboardAttributes? {
+            didSet {
+                if device.keyboardController().isEditing() {
+                    boundText = device.keyboardController().text()
+                } else {
+                    boundText = ""
+                }
+            }
+        }
+        
+        @State var boundText: String = "" {
+            didSet {
+                guard device.keyboardController().isEditing() else {
+                    return
+                }
+                if device.keyboardController().text() == boundText {
+                    return
+                }
+                device.keyboardController().setText(boundText)
+            }
+        }
+        
+        func submit() {
+            guard device.keyboardController().isEditing() else {
+                return
+            }
+            device.keyboardController().sendReturnKey()
+        }
+        
+        var body: some View {
+            HStack {
+                TextField("Text", text: $boundText)
+                Button(action: submit) {
+                    Text("Submit")
                 }
             }
         }
@@ -233,6 +272,13 @@ struct DeviceView: View {
             PowerControls(device: $device)
             PlaybackControls(device: $device)
             NavigationControls(device: $device)
+            TextEditingControl(device: $device, editingContext: $editingContext).disabled(editingContext == nil)
+            VStack {
+                Button("Capture Cursor") {
+                    CursorManager.shared.start()
+                }
+                TrackPadViewController(device: $device)
+            }
             WrappingHStack(fallbackButtons, spacing: .dynamicIncludingBorders(minSpacing: 5)) { button in
                 DeviceButton(device: $device, button: button)
                     .padding(.vertical, 5)
@@ -241,13 +287,45 @@ struct DeviceView: View {
     }
 }
 
+extension ObservableObject {
+    func binding<Key: Hashable, Value>(forDictionary dictionary: ReferenceWritableKeyPath<Self, [Key: Value]>, atKey key: Key, defaultValue: @autoclosure @escaping () -> Value) -> Binding<Value> {
+        Binding(get: {
+            return self[keyPath: dictionary][key] ?? defaultValue()
+        }, set: {
+            self[keyPath: dictionary][key] = $0
+        })
+    }
+    
+    func binding<Key: Hashable, Value>(forDictionary dictionary: ReferenceWritableKeyPath<Self, [Key: Value]>, atKey key: Key) -> Binding<Value?> {
+        Binding(get: {
+            return self[keyPath: dictionary][key]
+        }, set: {
+            self[keyPath: dictionary][key] = $0
+        })
+    }
+}
+
+extension _TVRXDevice {
+    var binding: Binding<_TVRXDevice> {
+        GibTVState.shared.binding(forDictionary: \.devicesByID, atKey: id, defaultValue: _TVRXDevice())
+    }
+    
+    var binding_supportedButtons: Binding<[TVRCButton]> {
+        GibTVState.shared.binding(forDictionary: \.deviceButtons, atKey: id, defaultValue: [])
+    }
+    
+    var binding_editingContext: Binding<TVRCKeyboardAttributes?> {
+        GibTVState.shared.binding(forDictionary: \.editingContexts, atKey: self)
+    }
+}
+
 struct ContentView: View {
-    @StateObject var queryController = GibTVQueryController.shared
+    @StateObject var state = GibTVState.shared
     
     var body: some View {
         List {
-            ForEach(queryController.devices) { device in
-                DeviceView(device: device)
+            ForEach(state.devices) { device in
+                DeviceView(device: device.binding, buttons: device.binding_supportedButtons, editingContext: device.binding_editingContext)
             }
         }
     }

@@ -14,6 +14,7 @@
 		1DCAA27227A5EB12005EAEE3 /* TVRemoteCore.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCAA27127A5EB12005EAEE3 /* TVRemoteCore.tbd */; };
 		1DCAA27427A5EFB0005EAEE3 /* GibTV.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA27327A5EFB0005EAEE3 /* GibTV.m */; };
 		1DCAA27727A611E7005EAEE3 /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 1DCAA27627A611E7005EAEE3 /* WrappingHStack */; };
+		1DCAA27927A72F11005EAEE3 /* Fingers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA27827A72F11005EAEE3 /* Fingers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		1DCAA26E27A5EA06005EAEE3 /* GibTV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GibTV.h; sourceTree = "<group>"; };
 		1DCAA27127A5EB12005EAEE3 /* TVRemoteCore.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = TVRemoteCore.tbd; sourceTree = "<group>"; };
 		1DCAA27327A5EFB0005EAEE3 /* GibTV.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GibTV.m; sourceTree = "<group>"; };
+		1DCAA27827A72F11005EAEE3 /* Fingers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fingers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 				1DCAA26E27A5EA06005EAEE3 /* GibTV.h */,
 				1DCAA27127A5EB12005EAEE3 /* TVRemoteCore.tbd */,
 				1DCAA27327A5EFB0005EAEE3 /* GibTV.m */,
+				1DCAA27827A72F11005EAEE3 /* Fingers.swift */,
 			);
 			path = GibTV;
 			sourceTree = "<group>";
@@ -158,6 +161,7 @@
 			files = (
 				1DCAA27427A5EFB0005EAEE3 /* GibTV.m in Sources */,
 				1DCAA26227A5E9BA005EAEE3 /* ContentView.swift in Sources */,
+				1DCAA27927A72F11005EAEE3 /* Fingers.swift in Sources */,
 				1DCAA26027A5E9BA005EAEE3 /* GibTVApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
