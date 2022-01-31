@@ -15,6 +15,10 @@
 		1DCAA27427A5EFB0005EAEE3 /* GibTV.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA27327A5EFB0005EAEE3 /* GibTV.m */; };
 		1DCAA27727A611E7005EAEE3 /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 1DCAA27627A611E7005EAEE3 /* WrappingHStack */; };
 		1DCAA27927A72F11005EAEE3 /* Fingers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA27827A72F11005EAEE3 /* Fingers.swift */; };
+		1DCAA27B27A77098005EAEE3 /* TrackpadProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA27A27A77098005EAEE3 /* TrackpadProxy.swift */; };
+		1DCAA27E27A77DD8005EAEE3 /* NSTouchPhase+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA27D27A77DD8005EAEE3 /* NSTouchPhase+Description.swift */; };
+		1DCAA28727A78D2E005EAEE3 /* DeviceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA28627A78D2E005EAEE3 /* DeviceButton.swift */; };
+		1DCAA28927A78D47005EAEE3 /* TextEditingControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCAA28827A78D47005EAEE3 /* TextEditingControl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +32,10 @@
 		1DCAA27127A5EB12005EAEE3 /* TVRemoteCore.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = TVRemoteCore.tbd; sourceTree = "<group>"; };
 		1DCAA27327A5EFB0005EAEE3 /* GibTV.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GibTV.m; sourceTree = "<group>"; };
 		1DCAA27827A72F11005EAEE3 /* Fingers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fingers.swift; sourceTree = "<group>"; };
+		1DCAA27A27A77098005EAEE3 /* TrackpadProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackpadProxy.swift; sourceTree = "<group>"; };
+		1DCAA27D27A77DD8005EAEE3 /* NSTouchPhase+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSTouchPhase+Description.swift"; sourceTree = "<group>"; };
+		1DCAA28627A78D2E005EAEE3 /* DeviceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceButton.swift; sourceTree = "<group>"; };
+		1DCAA28827A78D47005EAEE3 /* TextEditingControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditingControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +70,8 @@
 		1DCAA25E27A5E9BA005EAEE3 /* GibTV */ = {
 			isa = PBXGroup;
 			children = (
+				1DCAA27F27A78CC8005EAEE3 /* RemoteButtons */,
+				1DCAA27C27A77DD0005EAEE3 /* Extensions */,
 				1DCAA25F27A5E9BA005EAEE3 /* GibTVApp.swift */,
 				1DCAA26127A5E9BA005EAEE3 /* ContentView.swift */,
 				1DCAA26327A5E9BB005EAEE3 /* Assets.xcassets */,
@@ -71,6 +81,7 @@
 				1DCAA27127A5EB12005EAEE3 /* TVRemoteCore.tbd */,
 				1DCAA27327A5EFB0005EAEE3 /* GibTV.m */,
 				1DCAA27827A72F11005EAEE3 /* Fingers.swift */,
+				1DCAA27A27A77098005EAEE3 /* TrackpadProxy.swift */,
 			);
 			path = GibTV;
 			sourceTree = "<group>";
@@ -81,6 +92,23 @@
 				1DCAA26627A5E9BB005EAEE3 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1DCAA27C27A77DD0005EAEE3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				1DCAA27D27A77DD8005EAEE3 /* NSTouchPhase+Description.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		1DCAA27F27A78CC8005EAEE3 /* RemoteButtons */ = {
+			isa = PBXGroup;
+			children = (
+				1DCAA28627A78D2E005EAEE3 /* DeviceButton.swift */,
+				1DCAA28827A78D47005EAEE3 /* TextEditingControl.swift */,
+			);
+			path = RemoteButtons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -159,9 +187,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DCAA28927A78D47005EAEE3 /* TextEditingControl.swift in Sources */,
 				1DCAA27427A5EFB0005EAEE3 /* GibTV.m in Sources */,
+				1DCAA27E27A77DD8005EAEE3 /* NSTouchPhase+Description.swift in Sources */,
 				1DCAA26227A5E9BA005EAEE3 /* ContentView.swift in Sources */,
 				1DCAA27927A72F11005EAEE3 /* Fingers.swift in Sources */,
+				1DCAA27B27A77098005EAEE3 /* TrackpadProxy.swift in Sources */,
+				1DCAA28727A78D2E005EAEE3 /* DeviceButton.swift in Sources */,
 				1DCAA26027A5E9BA005EAEE3 /* GibTVApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -152,25 +152,11 @@ class GibTVQueryController: NSObject, _TVRXDeviceQueryDelegate, _TVRXDeviceDeleg
     }
 }
 
-class GibTVApplicationDelegate: NSObject, NSApplicationDelegate {
-//    static let shared = GibTVApplicationDelegate()
-    
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        guard let window = NSApp.windows.first else {
-            fatalError()
-        }
-        window.level = .floating
-    }
-}
-
 @main
 struct GibTVApp: App {
     lazy var query = _TVRXDeviceQuery()
     
     var cancellables: Set<AnyCancellable> = Set()
-    
-//    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @NSApplicationDelegateAdaptor(GibTVApplicationDelegate.self) var appDelegate
     
     init() {
         UserDefaults(suiteName: "com.apple.mediaremote")!.set(true, forKey: "MRExternalDeviceIncludePeerToPeer")
@@ -178,10 +164,10 @@ struct GibTVApp: App {
         query.setDelegate(GibTVQueryController.shared)
         query.start()
         
-        RemoteTouchCollector.touchPublisher.sink { event in
+        TrackpadProxy.shared.tvTouchPublisher.sink { event in
             GibTVState.shared.devices.first?.send(event)
         }.store(in: &cancellables)
-        RemoteTouchCollector.selectPublisher.sink { event in
+        TrackpadProxy.shared.selectPublisher.sink { event in
             switch event {
             case .down:
                 GibTVState.shared.devices.first?.trigger(button: .select, type: .pressed)
@@ -193,7 +179,18 @@ struct GibTVApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-        }
+            ContentView().background(.red)
+        }.windowStyle(.hiddenTitleBar)
     }
+}
+
+struct VisualEffect: NSViewRepresentable {
+    
+    
+   func makeNSView(context: Self.Context) -> NSView {
+       let view = NSVisualEffectView()
+       view.material = .contentBackground
+       return view
+   }
+   func updateNSView(_ nsView: NSView, context: Context) { }
 }
