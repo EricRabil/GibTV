@@ -6,91 +6,12 @@
 //
 
 import SwiftUI
-
-enum DeviceButtonPresentationStyle {
-    case systemImage(String)
-    case text(String)
-}
-
-extension TVRCButtonType {
-    var presentationStyle: DeviceButtonPresentationStyle {
-        switch self {
-        case .select:
-            return .text("Select")
-        case .menu:
-            return .text("Menu")
-        case .home:
-            return .systemImage("tv")
-        case .siri:
-            return .systemImage("mic")
-        case .playPause:
-            return .systemImage("playpause")
-        case .volumeUp:
-            return .systemImage("plus")
-        case .volumeDown:
-            return .systemImage("minus")
-        case .arrowUp:
-            return .systemImage("chevron.up")
-        case .arrowDown:
-            return .systemImage("chevron.down")
-        case .arrowLeft:
-            return .systemImage("chevron.left")
-        case .arrowRight:
-            return .systemImage("chevron.right")
-        case .captionsToggle:
-            return .text("Toggle Captions")
-        case .activateScreenSaver:
-            return .text("Activate Screen Saver")
-        case .launchApplication:
-            return .text("Launch Application")
-        case .wake:
-            return .text("Wake")
-        case .sleep:
-            return .text("Sleep")
-        case .pageUp:
-            return .text("Page Up")
-        case .pageDown:
-            return .text("Page Down")
-        case .guide:
-            return .text("Guide")
-        case .mute:
-            return .systemImage("speaker.slash")
-        case .power:
-            return .text("Power")
-        @unknown default:
-            return .text(description)
-        }
-    }
-}
-
-enum ButtonProperty {
-    case keyboardShortcut(KeyEquivalent, modifiers: EventModifiers)
-    
-    static func keyboardShortcut(_ key: KeyEquivalent) -> ButtonProperty {
-        .keyboardShortcut(key, modifiers: [])
-    }
-    
-    static func keyboardShortcut(modifier: EventModifiers, _ key: KeyEquivalent) -> ButtonProperty {
-        .keyboardShortcut(key, modifiers: modifier)
-    }
-}
-
-var buttonProperties: [TVRCButtonType: [ButtonProperty]] = [
-    .volumeUp: [.keyboardShortcut(modifier: .command, .upArrow)],
-    .playPause: [.keyboardShortcut(.space)],
-    .volumeDown: [.keyboardShortcut(modifier: .command, .downArrow)],
-    .select: [.keyboardShortcut(.return)],
-    .menu: [.keyboardShortcut(.escape)],
-    .arrowRight: [.keyboardShortcut(.rightArrow)],
-    .arrowDown: [.keyboardShortcut(.downArrow)],
-    .arrowUp: [.keyboardShortcut(.upArrow)],
-    .arrowLeft: [.keyboardShortcut(.leftArrow)]
-]
+import TVRemoteCore
 
 private extension View {
     func applyProperties(_ type: TVRCButtonType) -> some View {
         var view: AnyView = AnyView(self)
-        if let props = buttonProperties[type] {
+        if let props = ButtonProperty.properties[type] {
             for prop in props {
                 switch prop {
                 case .keyboardShortcut(let key, let modifiers):
@@ -103,38 +24,48 @@ private extension View {
 }
 
 class DeviceContext: ObservableObject {
-    @Published var device: _TVRXDevice
+    @Published var device: TVRXDevice
     
-    init(device: _TVRXDevice) {
+    init(device: TVRXDevice) {
         self.device = device
     }
 }
 
-protocol DeviceButtonDelegate {
-    static var delegatedButtonTypes: [TVRCButtonType] { get }
-}
-
+/// A control mapping to exactly one triggerable button on a `TVRXDevice`
 struct DeviceButton: View {
     @EnvironmentObject var deviceContext: DeviceContext
-    
-    var device: _TVRXDevice {
-        deviceContext.device
-    }
-    
-    var buttonType: TVRCButtonType
+    @EnvironmentObject var pressedButtons: PressedButtonContext
     
     @State private var disabled = false
-    private var presentationStyle: DeviceButtonPresentationStyle
+    @State private var suppressNextAction = false
+    
+    let buttonType: TVRCButtonType
+    let presentationStyle: DeviceButtonPresentationStyle
     
     init(type: TVRCButtonType) {
         buttonType = type
         presentationStyle = type.presentationStyle
     }
     
+    var pressed: Bool {
+        get {
+            pressedButtons.pressed[buttonType, default: false]
+        }
+        set {
+            pressedButtons.pressed[buttonType] = newValue
+        }
+    }
+    
+    var device: TVRXDevice {
+        deviceContext.device
+    }
+    
+    var button: TVRCButton? {
+        device.button(withType: buttonType)
+    }
+    
     var body: some View {
-        return Button(action: {
-            device.press(button: buttonType)
-        }) {
+        Group {
             switch presentationStyle {
             case .systemImage(let string):
                 Image(systemName: string)
@@ -142,10 +73,35 @@ struct DeviceButton: View {
                 Text(string)
             }
         }
-        .onChange(of: [device.supportedButtons(), buttonType] as [AnyHashable]) { _ in
-            disabled = !device.supportedButtons().contains(where: { $0.buttonType() == buttonType })
-        }
+        .buttonStyle(BorderedProminentButtonStyle())
+        .padding()
+        .background(pressed ? Color.accentColor : .white)
+        .cornerRadius(5)
         .applyProperties(buttonType)
+        ._onButtonGesture(pressing: { pressing in
+            self.pressedButtons.pressed[self.buttonType] = pressing
+            if pressing {
+                send(event: .pressed)
+            } else {
+                send(event: .released)
+                suppressNextAction = true
+            }
+        }, perform: {
+            if suppressNextAction {
+                suppressNextAction = false
+                return
+            }
+        })
         .disabled(disabled)
+        .onChange(of: deviceContext.device.supportedButtons(), perform: { buttons in
+            disabled = !buttons.lazy.map { $0.buttonType() }.contains(buttonType)
+        })
+    }
+    
+    func send(event: TVRCButtonEventType) {
+        guard let button = button else {
+            return
+        }
+        device.send(.init(for: button, eventType: event))
     }
 }

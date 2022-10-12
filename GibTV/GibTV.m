@@ -6,7 +6,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "GibTV.h"
+
+__attribute__((weak_import)) @interface RPCompanionLinkClient: NSObject
+@end
 
 asm(".weak_reference _OBJC_CLASS_$_RPCompanionLinkClient");
 
@@ -16,7 +18,10 @@ asm(".weak_reference _OBJC_CLASS_$_RPCompanionLinkClient");
 }
 @end
 
-@implementation _TVRXDeviceQuery (copyWithZone)
+@interface TVRXDeviceQuery: NSObject
+@end
+
+@implementation TVRXDeviceQuery (copyWithZone)
 -(instancetype)copyWithZone:(NSZone*)zone {
     return self;
 }

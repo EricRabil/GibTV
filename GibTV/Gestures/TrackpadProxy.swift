@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import AppKit
+import TVRemoteCore
 
 enum SelectAction {
     case down
@@ -16,70 +17,6 @@ enum SelectAction {
 
 @_silgen_name("CGCursorIsVisible")
 private func CGCursorIsVisible() -> boolean_t
-
-private extension CGEventType {
-    var isSelectEvent: Bool {
-        isSelectPressedEvent || isSelectReleasedEvent
-    }
-    
-    var isSelectPressedEvent: Bool {
-        self == .leftMouseDown
-    }
-    
-    var isSelectReleasedEvent: Bool {
-        self == .leftMouseUp
-    }
-    
-    var meansWeShouldReenableTap: Bool {
-        self == .tapDisabledByUserInput
-    }
-    
-    var isInterestingTouchEvent: Bool {
-        rawValue == 29
-    }
-}
-
-private extension NSTouch {
-    var tvTouch: TVRCTouchEvent? {
-        let timestamp = self.value(forKey: "timestamp") as! Double
-        let phase = self.phase
-        let index = self.value(forKey: "index") as! CLongLong
-        
-        var position = self.normalizedPosition
-        position.y = 1 - position.y
-        
-        return TVRCTouchEvent()._init(withTimestamp: timestamp, finger: index, phase: Int64(phase.rawValue), digitizerLocation: position)
-    }
-}
-
-private extension CGEvent {
-    var nsEvent: NSEvent? {
-        guard type.isInterestingTouchEvent else {
-            return nil
-        }
-        return NSEvent(cgEvent: self)
-    }
-    
-    struct CGTouchEvent {
-        var nsTouch: NSTouch
-        var tvTouch: TVRCTouchEvent
-        
-        init?(nsTouch: NSTouch) {
-            self.nsTouch = nsTouch
-            guard let tvTouch = nsTouch.tvTouch else {
-                return nil
-            }
-            self.tvTouch = tvTouch
-        }
-    }
-    
-    func touchEvents() -> [CGTouchEvent]? {
-        guard let nsEvent = nsEvent else {
-            return nil
-        }
-        return nsEvent.allTouches().compactMap(CGTouchEvent.init(nsTouch:))
-    }
-}
 
 private extension NSScreen {
     var cgScreenID: CGDirectDisplayID? {
@@ -97,6 +34,7 @@ class Gib {
     }
 }
 
+/// Receives HID events from CoreGraphics and emits touch events for AppKit, TVRemoteCore, and down/up detection.
 class TrackpadProxy {
     class State: ObservableObject {
         fileprivate init() {}
@@ -112,6 +50,7 @@ class TrackpadProxy {
     
     // MARK: - Cursor
     
+    /// Whether we should maintain a hidden/visible cursor at this time.
     private(set) var wantsHiddenCursor = false
     
     // MARK: - Combine
