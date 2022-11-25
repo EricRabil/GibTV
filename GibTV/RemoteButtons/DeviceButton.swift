@@ -64,6 +64,8 @@ struct DeviceButton: View {
         device.button(withType: buttonType)
     }
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         Group {
             switch presentationStyle {
@@ -75,7 +77,7 @@ struct DeviceButton: View {
         }
         .buttonStyle(BorderedProminentButtonStyle())
         .padding()
-        .background(pressed ? Color.accentColor : .white)
+        .background(pressed ? Color.accentColor : Color.init(nsColor: NSColor.controlBackgroundColor))
         .cornerRadius(5)
         .applyProperties(buttonType)
         ._onButtonGesture(pressing: { pressing in
